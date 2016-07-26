@@ -87,6 +87,7 @@ class Field {
     }
 
     // access via (i,j) pair
+    #pragma acc routine seq
     inline double& operator() (int i, int j) {
         #ifdef DEBUG
         assert(i>=0 && i<xdim_ && j>=0 && j<ydim_);
@@ -94,6 +95,7 @@ class Field {
         return ptr_[i+j*xdim_];
     }
 
+    #pragma acc routine seq
     inline double const& operator() (int i, int j) const  {
         #ifdef DEBUG
         assert(i>=0 && i<xdim_ && j>=0 && j<ydim_);
@@ -102,6 +104,7 @@ class Field {
     }
 
     // access as a 1D field
+    #pragma acc routine seq
     inline double& operator[] (int i) {
         #ifdef DEBUG
         assert(i>=0 && i<xdim_*ydim_);
@@ -109,6 +112,7 @@ class Field {
         return ptr_[i];
     }
 
+    #pragma acc routine seq
     inline double const& operator[] (int i) const {
         #ifdef DEBUG
         assert(i>=0 && i<xdim_*ydim_);
