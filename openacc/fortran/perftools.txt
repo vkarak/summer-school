@@ -3,7 +3,7 @@ steps to load and use perftools-lite. note that you shuld set the CRAYPAT_LITE e
 module load perftools-lite
 export CRAYPAT_LITE=gpu
 make
-aprun -n 1 ./main 256 256 200 0.01
+srun -n 1 ./main 256 256 200 0.01
 
 Then you can follow the output of the aprun to use app2 to generate output like that below
 

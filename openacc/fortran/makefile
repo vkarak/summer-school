@@ -51,7 +51,7 @@ main_mpi: $(OBJ_MPI) main.f90
 	$(FTN) $(FFLAGS) $(OBJ_MPI) main.f90  -o main_mpi
 
 clean:
-	rm -f main
+	rm -f main main_mpi
 	rm -f *.o
 	rm -f *.i
 	rm -f *.mod

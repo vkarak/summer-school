@@ -1,3 +1,6 @@
+#!/bin/bash -l
+
+export CRAY_CUDA_MPS=1
 export MPICH_RDMA_ENABLED_CUDA=1
 #unset MPICH_RDMA_ENABLED_CUDA
 
@@ -13,7 +16,7 @@ do
     xdim=$[$nprocx * $dim]
     ydim=$[$nprocy * $dim]
     nproc=$[$nprocx * $nprocy]
-    steps_per_second=`aprun -n $nproc  -N 1 ./main $xdim $ydim $nt 0.0025 | grep "per second" | awk '{printf("%9.1f", $5)}'`
+    steps_per_second=`srun -N $nproc -n $nproc ./main_mpi $xdim $ydim $nt 0.0025 | grep "per second" | awk '{printf("%9.1f", $1)}'`
     echo "CG iterations per second = $steps_per_second :: $nproc nodes ($xdim*$ydim)"
     if [ "$nprocx" -lt "$nprocy" ]
     then
@@ -31,7 +34,7 @@ echo "============================================="
 nproc=1
 for i in 1 2 3 4 5
 do
-    steps_per_second=`aprun -n $nproc  -N 1 ./main $dim $dim $nt 0.0025 | grep "per second" | awk '{printf("%9.1f", $5)}'`
+    steps_per_second=`srun -N $nproc -n $nproc ./main_mpi $dim $dim $nt 0.0025 | grep "per second" | awk '{printf("%9.1f", $1)}'`
     echo "CG iterations per second = $steps_per_second :: $nproc nodes ($dim*$dim)"
     nproc=$[$nproc * 2];
 done
