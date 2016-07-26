@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 
     std::cout << "========================================================================" << std::endl;
     std::cout << "                      Welcome to mini-stencil!" << std::endl;
-    std::cout << "version   :: Serial C++" << std::endl;
+    std::cout << "version   :: OpenACC C++" << std::endl;
     std::cout << "mesh      :: " << options.nx << " * " << options.ny << " dx = " << options.dx << std::endl;
     std::cout << "time      :: " << nt << " time steps from 0 .. " << options.nt*options.dt << std::endl;;
     std::cout << "iteration :: " << "CG "          << max_cg_iters
