@@ -35,7 +35,7 @@ void diffusion(data::Field &U, data::Field &S)
 
     // the interior grid points
 
-    // TODO: offload all the following loops on the GPU; let the compiler launch
+    // TODO: offload all domain computations on the GPU; let the compiler launch
     // different kernels for each loop
 
     // TODO: offload loops on the GPU

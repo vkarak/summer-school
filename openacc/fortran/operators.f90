@@ -36,14 +36,12 @@ subroutine diffusion(u, s)
     iend  = options%nx-1
     jend  = options%ny-1
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !$acc parallel present(s, u, x_old, bndE, bndW, bndN, bndS, options)
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    ! TODO: offload all the following loops on the GPU
 
     ! the interior grid points
-    !$acc loop
+    ! TODO: offload loops on the GPU
     do j = 2, jend
-        !$acc loop
         do i = 2, iend
             s(i,j) = -(4.+alpha) * u(i,j)           &   ! central point
                         + u(i-1, j) + u(i+1, j)     &   ! east and west
@@ -55,7 +53,7 @@ subroutine diffusion(u, s)
 
     ! the east boundary
     i = options%nx
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do j = 2, jend
         s(i,j) = -(4.+alpha) * u(i,j)        &
                     + u(i-1, j) + u(i, j-1) + u(i, j+1) &
@@ -65,7 +63,7 @@ subroutine diffusion(u, s)
 
     ! the west boundary
     i = 1
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do j = 2, jend
         s(i,j) = -(4.+alpha) * u(i,j)         &
                     + u(i+1, j) + u(i, j-1) + u(i, j+1) &
@@ -83,7 +81,7 @@ subroutine diffusion(u, s)
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
     ! north boundary
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do i = 2, iend
         s(i,j) = -(4.+alpha) * u(i,j)        &
                     + u(i-1, j) + u(i+1, j) + u(i, j-1) &
@@ -108,7 +106,7 @@ subroutine diffusion(u, s)
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
     ! south boundary
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do i = 2, iend
         s(i,j) = -(4.+alpha) * u(i,j)           &
                     + u(i-1,j  ) + u(i+1,j  )   &
@@ -125,9 +123,6 @@ subroutine diffusion(u, s)
                 + bndE(j) + bndS(i) &
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !$acc end parallel
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     ! accumulate the flop counts
     ! 8 ops total per point
@@ -138,4 +133,3 @@ subroutine diffusion(u, s)
 end
 
 end module operators
-

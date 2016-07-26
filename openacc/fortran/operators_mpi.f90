@@ -38,33 +38,32 @@ subroutine diffusion(u, s)
     nx  = options%nx
     ny  = options%ny
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !$acc data present(u, buffN, buffS, buffE, buffW)
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! TODO: offload all the following loops on the GPU
 
-    !$acc parallel
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do i = 1,nx
         buffN(i) = u(i,ny)
     end do
-    !$acc loop
+
+    ! TODO: offload loop on the GPU
     do i = 1,nx
         buffS(i) = u(i,1)
     end do
-    !$acc loop
+
+    ! TODO: offload loop on the GPU
     do j = 1,ny
         buffE(j) = u(nx,j)
     end do
-    !$acc loop
+
+    ! TODO: offload loop on the GPU
     do j = 1,ny
         buffW(j) = u(1,j)
     end do
-    !$acc end parallel
 
 #ifdef USE_G2G
-    !$acc host_data use_device(bndN, buffN, bndS, buffS, bndE, buffE, bndW, buffW)
+    ! TODO: Use device pointers in the following MPI calls, so as to use RMDA
 #else
-    !$acc update host(buffN, buffE, buffS, buffW)
+    ! TODO: Update host copies before doing the communication
 #endif
     num_requests = 0
     if (domain%neighbour_north>=0) then
@@ -101,18 +100,16 @@ subroutine diffusion(u, s)
         num_requests = num_requests + 2
     endif
 #ifdef USE_G2G
-    !$acc end host_data
+    ! TODO: closing directive
 #endif
     call mpi_waitall(num_requests, requests, stats, err)
 #ifndef USE_G2G
-    !$acc update device (bndE, bndW, bndS, bndN)
+    ! TODO: update the device copies of received data
 #endif
 
-    !$acc parallel 
-    ! the interior grid points
-    !$acc loop
+    ! TODO: offload all domain computations on the GPU
+    ! TODO: offload loops on the GPU
     do j = 2, jend
-        !$acc loop
         do i = 2, iend
             s(i,j) = -(4.+alpha) * u(i,j)           &   ! central point
                         + u(i-1, j) + u(i+1, j)     &   ! east and west
@@ -124,7 +121,7 @@ subroutine diffusion(u, s)
 
     ! the east boundary
     i = options%nx
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do j = 2, jend
         s(i,j) = -(4.+alpha) * u(i,j)        &
                     + u(i-1, j) + u(i, j-1) + u(i, j+1) &
@@ -134,7 +131,7 @@ subroutine diffusion(u, s)
 
     ! the west boundary
     i = 1
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do j = 2, jend
         s(i,j) = -(4.+alpha) * u(i,j)         &
                     + u(i+1, j) + u(i, j-1) + u(i, j+1) &
@@ -152,7 +149,7 @@ subroutine diffusion(u, s)
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
     ! north boundary
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do i = 2, iend
         s(i,j) = -(4.+alpha) * u(i,j)                   &
                     + u(i-1, j) + u(i+1, j) + u(i, j-1) &
@@ -177,7 +174,7 @@ subroutine diffusion(u, s)
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
     ! south boundary
-    !$acc loop
+    ! TODO: offload loop on the GPU
     do i = 2, iend
         s(i,j) = -(4.+alpha) * u(i,j)           &
                     + u(i-1,j  ) + u(i+1,j  )   &
@@ -194,11 +191,6 @@ subroutine diffusion(u, s)
                 + bndE(j) + bndS(i)     &
                 + dxs*u(i,j)*(1.0_8 - u(i,j))
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !$acc end parallel
-    !$acc end data
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
     ! accumulate the flop counts
     ! 8 ops total per point
     flops_diff =  flops_diff                                &
@@ -208,4 +200,3 @@ subroutine diffusion(u, s)
 end
 
 end module operators
-

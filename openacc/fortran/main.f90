@@ -139,8 +139,9 @@ program diffusion_serial
     converged = .true.
 
     timestep = 1;
-    !$acc data copy(x_old, x_new, deltax, Ap, p, r, b, v, Fx, Fxold, x, xold, bndN, bndE, bndS, bndW, options, buffN, buffE, buffW, buffS)
-    !$acc wait
+
+    ! TODO: copy/create all necessary data to/in the GPU
+    ! TODO: wait for previous operations to finish before taking a timestamp
 
     ! start timer
     timespent = -omp_get_wtime();
@@ -190,10 +191,10 @@ program diffusion_serial
 
         timestep = timestep+1
     end do
-    !$acc wait
+
+    ! TODO: wait for previous operations to finish before taking a timestamp
     ! get times
     timespent = timespent + omp_get_wtime();
-    !$acc end data
 
     flops_total = flops_diff + flops_blas1
 
