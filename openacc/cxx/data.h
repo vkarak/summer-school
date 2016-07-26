@@ -40,8 +40,7 @@ class Field {
         #endif
 
         ptr_ = new double[xdim*ydim];
-        #pragma acc enter data copyin(this)
-        #pragma acc enter data create(ptr_[0:xdim*ydim])
+        // TODO: copy this object to the GPU; take care of ptr_ as well
     };
 
     // destructor
@@ -61,20 +60,19 @@ class Field {
         xdim_ = xdim;
         ydim_ = ydim;
 
-        #pragma acc enter data copyin(this)
-        #pragma acc enter data create(ptr_[0:xdim*ydim])
+        // TODO: copy this object to the GPU; take care of ptr_ as well
     }
 
     void update_host()
     {
         auto ptr = ptr_;
-        #pragma acc update host(ptr[0:xdim_*ydim_])
+        // TODO: update host copy of this object; use ptr instead of ptr_
     }
 
     void update_device()
     {
         auto ptr = ptr_;
-        #pragma acc update device(ptr[0:xdim_*ydim_])
+        // TODO: update device copy of this object; use ptr instead of ptr_
     }
 
     double* data()
@@ -126,7 +124,7 @@ class Field {
 
     void free() {
          if (ptr_) {
-             #pragma acc exit data delete(ptr_[0:xdim_*ydim_], this)
+             // TODO: delete object on the device
              delete[] ptr_;
         }
 

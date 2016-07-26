@@ -34,10 +34,11 @@ void diffusion(data::Field &U, data::Field &S)
     int jend  = ny - 1;
 
     // the interior grid points
-    #pragma acc kernels present(U,S,x_old,bndE,bndW,bndN,bndS)
-    {
-        // #pragma acc parallel loop collapse(2)
-    #pragma acc loop collapse(2) independent
+
+    // TODO: offload all the following loops on the GPU; let the compiler launch
+    // different kernels for each loop
+
+    // TODO: offload loops on the GPU
     for (int j=1; j < jend; j++) {
         for (int i=1; i < iend; i++) {
             S(i,j) = -(4. + alpha) * U(i,j)               // central point
@@ -51,7 +52,7 @@ void diffusion(data::Field &U, data::Field &S)
     // the east boundary
     {
         int i = nx - 1;
-        #pragma acc loop independent
+        // TODO: offload loop on the GPU
         for (int j = 1; j < jend; j++)
         {
             S(i,j) = -(4. + alpha) * U(i,j)
@@ -64,7 +65,7 @@ void diffusion(data::Field &U, data::Field &S)
     // the west boundary
     {
         int i = 0;
-        #pragma acc loop independent
+        // TODO: offload loop on the GPU
         for (int j = 1; j < jend; j++)
         {
             S(i,j) = -(4. + alpha) * U(i,j)
@@ -87,7 +88,7 @@ void diffusion(data::Field &U, data::Field &S)
         }
 
         // north boundary
-        #pragma acc loop independent
+        // TODO: offload loop on the GPU
         for (int i = 1; i < iend; i++)
         {
             S(i,j) = -(4. + alpha) * U(i,j)
@@ -118,7 +119,7 @@ void diffusion(data::Field &U, data::Field &S)
         }
 
         // south boundary
-        #pragma acc loop independent
+        // TODO: offload loop on the GPU
         for (int i = 1; i < iend; i++)
         {
             S(i,j) = -(4. + alpha) * U(i,j)
@@ -135,7 +136,6 @@ void diffusion(data::Field &U, data::Field &S)
                         + dxs * U(i,j) * (1.0 - U(i,j));
         }
     }
-    } // end acc kernels
 
     // Accumulate the flop counts
     // 8 ops total per point
